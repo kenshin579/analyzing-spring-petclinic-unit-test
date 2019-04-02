@@ -90,7 +90,6 @@ public class ClinicServiceTest extends AbstractPetStoreTestCase{
         //TODO  testOwner.set....
 
         //1.등록 전 건수 조회
-        //TODO  테스트 실행
         Collection<Owner> prevOwnerResults = this.clinicService.findOwnerByLastName("");
         int found = prevOwnerResults.size();
 

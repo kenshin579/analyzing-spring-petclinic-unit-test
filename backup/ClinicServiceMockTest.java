@@ -66,11 +66,12 @@ public class ClinicServiceMockTest extends AbstractPetStoreTestCase {
 		when(petRepositry.findPetTypes()).thenReturn(getMockPetTypeList());
 
 		//1.테스트 실행
-		//TODO	findPetTypes을 실행하고 값을 받아오는 코드를 작성
-		clinicService.findPetTypes();
+		Collection<PetType> result = clinicService.findPetTypes();
 
 		//2.수행 결과가 예상결과와 같은지 확인하는 검증 구문 작성
-		//TODO	수행결과를 확인하는 검증 코드 작성
+		assertThat(result).hasSize(3)
+			.extracting(PetType::getName)
+			.contains("DOG", "CAT", "MONKEY");
 
 		//Z.Mock이 제대로 적용되었는지(최소 1번 수행되었는지) 확인 구문
 		verify(petRepositry, atLeastOnce()).findPetTypes();
@@ -82,10 +83,10 @@ public class ClinicServiceMockTest extends AbstractPetStoreTestCase {
 		when(petRepositry.findPetTypes()).thenReturn(null);
 
 		//1.테스트 실행
-		//TODO	findPetTypes을 실행하고 값을 받아오는 코드를 작성
+		Collection<PetType> result = clinicService.findPetTypes();
 
 		//2.수행 결과가 예상결과와 같은지 확인하는 검증 구문 작성
-		//TODO	수행결과를 확인하는 검증 코드 작성
+		assertNull(result);
 
 		//Z.Mock이 제대로 적용되었는지(최소 1번 수행되었는지) 확인 구문
 		verify(petRepositry, atLeastOnce()).findPetTypes();

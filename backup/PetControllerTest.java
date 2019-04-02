@@ -39,13 +39,8 @@ public class PetControllerTest extends AbstractPetStoreControllerTestCase {
 
 	@Before
 	public void setup() {
-
-	    this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
+		this.mockMvc = MockMvcBuilders.webAppContextSetup(wac).build();
 	}
-
-    @After
-    public void tearDown() throws Exception {
-    }
 
     @Test
     public void testInitCreationForm() throws Exception {
