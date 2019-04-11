@@ -32,102 +32,101 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * Test class for the {@link PetController}
- *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration({"classpath:spring/mvc-core-config.xml","classpath:spring/mvc-test-config.xml"})
+@ContextConfiguration({ "classpath:spring/mvc-core-config.xml", "classpath:spring/mvc-test-config.xml" })
 @WebAppConfiguration
 public class PetControllerMockTest {
 
-    private static final int TEST_OWNER_ID = 1;
-    private static final int TEST_PET_ID = 1;
+	private static final int TEST_OWNER_ID = 1;
+	private static final int TEST_PET_ID = 1;
 
-    @Autowired
-    private PetController petController;
+	@Autowired
+	private PetController petController;
 
-    @Autowired
-    private FormattingConversionServiceFactoryBean formattingConversionServiceFactoryBean;
+	@Autowired
+	private FormattingConversionServiceFactoryBean formattingConversionServiceFactoryBean;
 
-    @Autowired
-    private ClinicService clinicService;
+	@Autowired
+	private ClinicService clinicService; //mock으로 대체된다.(mvc-test-config.xml에 정의되어 있음)
 
-    private MockMvc mockMvc;
+	private MockMvc mockMvc;
 
-    @Before
-    public void setup() {
-        this.mockMvc = MockMvcBuilders
-                .standaloneSetup(petController)
-                .setConversionService(formattingConversionServiceFactoryBean.getObject())
-                .build();
+	@Before
+	public void setup() {
+		this.mockMvc = MockMvcBuilders
+				.standaloneSetup(petController)
+				.setConversionService(formattingConversionServiceFactoryBean.getObject())
+				.build();
 
-        PetType cat = new PetType();
-        cat.setId(3);
-        cat.setName("hamster");
-        given(this.clinicService.findPetTypes()).willReturn(Lists.newArrayList(cat));
-        given(this.clinicService.findOwnerById(TEST_OWNER_ID)).willReturn(new Owner());
-        given(this.clinicService.findPetById(TEST_PET_ID)).willReturn(new Pet());
-    }
+		PetType cat = new PetType();
+		cat.setId(3);
+		cat.setName("hamster");
+		given(this.clinicService.findPetTypes()).willReturn(Lists.newArrayList(cat));
+		given(this.clinicService.findOwnerById(TEST_OWNER_ID)).willReturn(new Owner());
+		given(this.clinicService.findPetById(TEST_PET_ID)).willReturn(new Pet());
+	}
 
-    @Test
-    public void testInitCreationForm() throws Exception {
-        mockMvc.perform(get("/owners/{ownerId}/pets/new", TEST_OWNER_ID))
-                .andExpect(status().isOk())
-                .andExpect(view().name("pets/createOrUpdatePetForm"))
-                .andExpect(model().attributeExists("pet"));
-    }
+	@Test
+	public void testInitCreationForm() throws Exception {
+		mockMvc.perform(get("/owners/{ownerId}/pets/new", TEST_OWNER_ID))
+				.andExpect(status().isOk())
+				.andExpect(view().name("pets/createOrUpdatePetForm"))
+				.andExpect(model().attributeExists("pet"));
+	}
 
-    @Test
-    public void testProcessCreationFormSuccess() throws Exception {
-        mockMvc.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID)
-                .param("name", "Betty")
-                .param("type", "hamster")
-                .param("birthDate", "2015/02/12")
-        )
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/owners/{ownerId}"));
-    }
+	@Test
+	public void testProcessCreationFormSuccess() throws Exception {
+		mockMvc.perform(post("/owners/{ownerId}/pets/new", TEST_OWNER_ID)
+				.param("name", "Betty")
+				.param("type", "hamster")
+				.param("birthDate", "2015/02/12")
+		)
+				.andExpect(status().is3xxRedirection())
+				.andExpect(view().name("redirect:/owners/{ownerId}"));
+	}
 
-    @Test
-    public void testProcessCreationFormHasErrors() throws Exception {
-        mockMvc.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID)
-                .param("name", "Betty")
-                .param("birthDate", "2015/02/12")
-        )
-                .andExpect(model().attributeHasNoErrors("owner"))
-                .andExpect(model().attributeHasErrors("pet"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("pets/createOrUpdatePetForm"));
-    }
+	@Test
+	public void testProcessCreationFormHasErrors() throws Exception {
+		mockMvc.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID)
+				.param("name", "Betty")
+				.param("birthDate", "2015/02/12")
+		)
+				.andExpect(model().attributeHasNoErrors("owner"))
+				.andExpect(model().attributeHasErrors("pet"))
+				.andExpect(status().isOk())
+				.andExpect(view().name("pets/createOrUpdatePetForm"));
+	}
 
-    @Test
-    public void testInitUpdateForm() throws Exception {
-        mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID))
-                .andExpect(status().isOk())
-                .andExpect(model().attributeExists("pet"))
-                .andExpect(view().name("pets/createOrUpdatePetForm"));
-    }
+	@Test
+	public void testInitUpdateForm() throws Exception {
+		mockMvc.perform(get("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID))
+				.andExpect(status().isOk())
+				.andExpect(model().attributeExists("pet"))
+				.andExpect(view().name("pets/createOrUpdatePetForm"));
+	}
 
-    @Test
-    public void testProcessUpdateFormSuccess() throws Exception {
-        mockMvc.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID)
-                .param("name", "Betty")
-                .param("type", "hamster")
-                .param("birthDate", "2015/02/12")
-        )
-                .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("redirect:/owners/{ownerId}"));
-    }
+	@Test
+	public void testProcessUpdateFormSuccess() throws Exception {
+		mockMvc.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID)
+				.param("name", "Betty")
+				.param("type", "hamster")
+				.param("birthDate", "2015/02/12")
+		)
+				.andExpect(status().is3xxRedirection())
+				.andExpect(view().name("redirect:/owners/{ownerId}"));
+	}
 
-    @Test
-    public void testProcessUpdateFormHasErrors() throws Exception {
-        mockMvc.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID)
-                .param("name", "Betty")
-                .param("birthDate", "2015/02/12")
-        )
-                .andExpect(model().attributeHasNoErrors("owner"))
-                .andExpect(model().attributeHasErrors("pet"))
-                .andExpect(status().isOk())
-                .andExpect(view().name("pets/createOrUpdatePetForm"));
-    }
+	@Test
+	public void testProcessUpdateFormHasErrors() throws Exception {
+		mockMvc.perform(post("/owners/{ownerId}/pets/{petId}/edit", TEST_OWNER_ID, TEST_PET_ID)
+				.param("name", "Betty")
+				.param("birthDate", "2015/02/12")
+		)
+				.andExpect(model().attributeHasNoErrors("owner"))
+				.andExpect(model().attributeHasErrors("pet"))
+				.andExpect(status().isOk())
+				.andExpect(view().name("pets/createOrUpdatePetForm"));
+	}
 
 }

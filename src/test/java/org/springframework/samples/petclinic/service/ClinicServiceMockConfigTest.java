@@ -36,31 +36,30 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:spring/mock-config-clinicservice.xml", "classpath:spring/business-config.xml"})
+@ContextConfiguration(locations = { "classpath:spring/mock-config-clinicservice.xml", "classpath:spring/business-config.xml" })
 @ActiveProfiles("jdbc")
-public class ClinicServiceMockConfigTest extends AbstractPetStoreTestCase{
-	@Autowired()
+public class ClinicServiceMockConfigTest extends AbstractPetStoreTestCase {
+	@Autowired
 	PetRepository mockPetRepositry;
-	
+
 	@Autowired
 	ClinicService clinicService;
-	
+
 	@Before
 	public void setUp() throws Exception {
-//		MockitoAnnotations.initMocks(this);
+		//		MockitoAnnotations.initMocks(this);
 	}
 
 	@After
 	public void tearDown() throws Exception {
 	}
 
-	
 	@Test
-	public void testFindPetTypes_DB에애완동물종류가없는경우()  throws Exception {
+	public void testFindPetTypes_DB에애완동물종류가없는경우() throws Exception {
 		when(mockPetRepositry.findPetTypes()).thenReturn(null);
-		
+
 		Collection<PetType> result = clinicService.findPetTypes();
 		assertNull(result);
-        verify(mockPetRepositry, atLeastOnce()).findPetTypes();
+		verify(mockPetRepositry, atLeastOnce()).findPetTypes();
 	}
 }

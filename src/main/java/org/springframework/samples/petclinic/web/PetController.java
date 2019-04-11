@@ -46,82 +46,82 @@ import java.util.Collection;
 public class PetController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(PetController.class);
 
-    private static final String VIEWS_PETS_CREATE_OR_UPDATE_FORM = "pets/createOrUpdatePetForm";
-    private final ClinicService clinicService;
+	private static final String VIEWS_PETS_CREATE_OR_UPDATE_FORM = "pets/createOrUpdatePetForm";
+	private final ClinicService clinicService;
 
-    @Autowired
-    public PetController(ClinicService clinicService) {
-        this.clinicService = clinicService;
-    }
+	@Autowired
+	public PetController(ClinicService clinicService) {
+		this.clinicService = clinicService;
+	}
 
-    @ModelAttribute("types")
-    public Collection<PetType> populatePetTypes() {
-        return this.clinicService.findPetTypes();
-    }
+	@ModelAttribute("types")
+	public Collection<PetType> populatePetTypes() {
+		return this.clinicService.findPetTypes();
+	}
 
-    @ModelAttribute("owner")
-    public Owner findOwner(@PathVariable("ownerId") int ownerId) {
-        return this.clinicService.findOwnerById(ownerId);
-    }
+	@ModelAttribute("owner")
+	public Owner findOwner(@PathVariable("ownerId") int ownerId) {
+		return this.clinicService.findOwnerById(ownerId);
+	}
 
-    @InitBinder("owner")
-    public void initOwnerBinder(WebDataBinder dataBinder) {
-        dataBinder.setDisallowedFields("id");
-    }
+	@InitBinder("owner")
+	public void initOwnerBinder(WebDataBinder dataBinder) {
+		dataBinder.setDisallowedFields("id");
+	}
 
-    @InitBinder("pet")
-    public void initPetBinder(WebDataBinder dataBinder) {
-        dataBinder.setValidator(new PetValidator());
-    }
+	@InitBinder("pet")
+	public void initPetBinder(WebDataBinder dataBinder) {
+		dataBinder.setValidator(new PetValidator());
+	}
 
-    @RequestMapping(value = "/pets/new", method = RequestMethod.GET)
-    public String initCreationForm(Owner owner, ModelMap model) {
-        Pet pet = new Pet();
-        owner.addPet(pet);
-        model.put("pet", pet);
-        return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
-    }
+	@RequestMapping(value = "/pets/new", method = RequestMethod.GET)
+	public String initCreationForm(Owner owner, ModelMap model) {
+		Pet pet = new Pet();
+		owner.addPet(pet);
+		model.put("pet", pet);
+		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+	}
 
-    @RequestMapping(value = "/pets/new", method = RequestMethod.POST)
-    public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result, ModelMap model) {
-        if (StringUtils.hasLength(pet.getName()) && pet.isNew() && owner.getPet(pet.getName(), true) != null){
-            result.rejectValue("name", "duplicate", "already exists");
-        }
-        if (result.hasErrors()) {
-            model.put("pet", pet);
-            return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
-        } else {
-            owner.addPet(pet);
-            try {
+	@RequestMapping(value = "/pets/new", method = RequestMethod.POST)
+	public String processCreationForm(Owner owner, @Valid Pet pet, BindingResult result, ModelMap model) {
+		if (StringUtils.hasLength(pet.getName()) && pet.isNew() && owner.getPet(pet.getName(), true) != null) {
+			result.rejectValue("name", "duplicate", "already exists");
+		}
+		if (result.hasErrors()) {
+			model.put("pet", pet);
+			return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+		} else {
+			owner.addPet(pet);
+			try {
 				this.clinicService.savePet(pet);
 			} catch (DataAccessException | PetClinicCoreException e) {
-				LOGGER.info("Error - {}",e.getMessage());
+				LOGGER.info("Error - {}", e.getMessage());
 			}
-            return "redirect:/owners/{ownerId}";
-        }
-    }
+			return "redirect:/owners/{ownerId}";
+		}
+	}
 
-    @RequestMapping(value = "/pets/{petId}/edit", method = RequestMethod.GET)
-    public String initUpdateForm(@PathVariable("petId") int petId, ModelMap model) {
-        Pet pet = this.clinicService.findPetById(petId);
-        model.put("pet", pet);
-        return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
-    }
+	@RequestMapping(value = "/pets/{petId}/edit", method = RequestMethod.GET)
+	public String initUpdateForm(@PathVariable("petId") int petId, ModelMap model) {
+		Pet pet = this.clinicService.findPetById(petId);
+		model.put("pet", pet);
+		return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+	}
 
-    @RequestMapping(value = "/pets/{petId}/edit", method = RequestMethod.POST)
-    public String processUpdateForm(@Valid Pet pet, BindingResult result, Owner owner, ModelMap model) {
-        if (result.hasErrors()) {
-            model.put("pet", pet);
-            return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
-        } else {
-            owner.addPet(pet);
-            try {
-            	this.clinicService.savePet(pet);
-            } catch (DataAccessException | PetClinicCoreException e) {
-            	LOGGER.info("Error - {}",e.getMessage());
-            }
-            return "redirect:/owners/{ownerId}";
-        }
-    }
+	@RequestMapping(value = "/pets/{petId}/edit", method = RequestMethod.POST)
+	public String processUpdateForm(@Valid Pet pet, BindingResult result, Owner owner, ModelMap model) {
+		if (result.hasErrors()) {
+			model.put("pet", pet);
+			return VIEWS_PETS_CREATE_OR_UPDATE_FORM;
+		} else {
+			owner.addPet(pet);
+			try {
+				this.clinicService.savePet(pet);
+			} catch (DataAccessException | PetClinicCoreException e) {
+				LOGGER.info("Error - {}", e.getMessage());
+			}
+			return "redirect:/owners/{ownerId}";
+		}
+	}
 
 }

@@ -38,60 +38,59 @@ import org.springframework.util.StopWatch;
 @Aspect
 public class CallMonitoringAspect {
 
-    private boolean enabled = true;
+	private boolean enabled = true;
 
-    private int callCount = 0;
+	private int callCount = 0;
 
-    private long accumulatedCallTime = 0;
+	private long accumulatedCallTime = 0;
 
-    @ManagedAttribute
-    public boolean isEnabled() {
-        return enabled;
-    }
+	@ManagedAttribute
+	public boolean isEnabled() {
+		return enabled;
+	}
 
-    @ManagedAttribute
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
-    }
+	@ManagedAttribute
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
 
-    @ManagedOperation
-    public void reset() {
-        this.callCount = 0;
-        this.accumulatedCallTime = 0;
-    }
+	@ManagedOperation
+	public void reset() {
+		this.callCount = 0;
+		this.accumulatedCallTime = 0;
+	}
 
-    @ManagedAttribute
-    public int getCallCount() {
-        return callCount;
-    }
+	@ManagedAttribute
+	public int getCallCount() {
+		return callCount;
+	}
 
-    @ManagedAttribute
-    public long getCallTime() {
-        if (this.callCount > 0)
-            return this.accumulatedCallTime / this.callCount;
-        else
-            return 0;
-    }
+	@ManagedAttribute
+	public long getCallTime() {
+		if (this.callCount > 0)
+			return this.accumulatedCallTime / this.callCount;
+		else
+			return 0;
+	}
 
+	@Around("within(@org.springframework.stereotype.Repository *)")
+	public Object invoke(ProceedingJoinPoint joinPoint) throws Throwable {
+		if (this.enabled) {
+			StopWatch sw = new StopWatch(joinPoint.toShortString());
 
-    @Around("within(@org.springframework.stereotype.Repository *)")
-    public Object invoke(ProceedingJoinPoint joinPoint) throws Throwable {
-        if (this.enabled) {
-            StopWatch sw = new StopWatch(joinPoint.toShortString());
-
-            sw.start("invoke");
-            try {
-                return joinPoint.proceed();
-            } finally {
-                sw.stop();
-                synchronized (this) {
-                    this.callCount++;
-                    this.accumulatedCallTime += sw.getTotalTimeMillis();
-                }
-            }
-        } else {
-            return joinPoint.proceed();
-        }
-    }
+			sw.start("invoke");
+			try {
+				return joinPoint.proceed();
+			} finally {
+				sw.stop();
+				synchronized (this) {
+					this.callCount++;
+					this.accumulatedCallTime += sw.getTotalTimeMillis();
+				}
+			}
+		} else {
+			return joinPoint.proceed();
+		}
+	}
 
 }

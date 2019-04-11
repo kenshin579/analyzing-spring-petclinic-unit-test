@@ -11,7 +11,7 @@ import org.springframework.test.context.web.WebAppConfiguration;
 @RunWith(SpringJUnit4ClassRunner.class)
 @Transactional
 @ActiveProfiles("jdbc")
-@ContextConfiguration({"classpath:spring/mvc-core-config.xml", "classpath:spring/business-config.xml"})
+@ContextConfiguration({ "classpath:spring/mvc-core-config.xml", "classpath:spring/business-config.xml" })
 @WebAppConfiguration
 public abstract class AbstractPetStoreControllerTestCase {
 

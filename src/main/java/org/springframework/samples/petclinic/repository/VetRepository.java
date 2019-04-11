@@ -31,12 +31,11 @@ import org.springframework.samples.petclinic.model.Vet;
  */
 public interface VetRepository {
 
-    /**
-     * Retrieve all <code>Vet</code>s from the data store.
-     *
-     * @return a <code>Collection</code> of <code>Vet</code>s
-     */
-    Collection<Vet> findAll() throws DataAccessException;
-
+	/**
+	 * Retrieve all <code>Vet</code>s from the data store.
+	 *
+	 * @return a <code>Collection</code> of <code>Vet</code>s
+	 */
+	Collection<Vet> findAll() throws DataAccessException;
 
 }

@@ -10,8 +10,8 @@
     <!-- ========================= RESOURCE DEFINITIONS ========================= -->
 
     <!-- import the dataSource definition -->
-        <!-- Mock Bean decl -->
-	<bean id="mockPetRepository" class="org.mockito.Mockito" factory-method="mock" primary="true">
+    <!-- Mock Bean decl -->
+    <bean id="mockPetRepository" class="org.mockito.Mockito" factory-method="mock" primary="true">
         <constructor-arg value="org.springframework.samples.petclinic.repository.PetRepository"/>
     </bean>
 </beans>

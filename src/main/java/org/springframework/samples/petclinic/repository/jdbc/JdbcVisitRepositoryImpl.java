@@ -44,61 +44,59 @@ import java.util.Map;
 @Repository
 public class JdbcVisitRepositoryImpl implements VisitRepository {
 
-    private NamedParameterJdbcTemplate jdbcTemplate;
+	private NamedParameterJdbcTemplate jdbcTemplate;
 
-    private SimpleJdbcInsert insertVisit;
+	private SimpleJdbcInsert insertVisit;
 
-    @Autowired
-    public JdbcVisitRepositoryImpl(DataSource dataSource) {
-        this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
+	@Autowired
+	public JdbcVisitRepositoryImpl(DataSource dataSource) {
+		this.jdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
 
-        this.insertVisit = new SimpleJdbcInsert(dataSource)
-            .withTableName("visits")
-            .usingGeneratedKeyColumns("id");
-    }
+		this.insertVisit = new SimpleJdbcInsert(dataSource)
+				.withTableName("visits")
+				.usingGeneratedKeyColumns("id");
+	}
 
+	@Override
+	public void save(Visit visit) throws DataAccessException {
+		if (visit.isNew()) {
+			Number newKey = this.insertVisit.executeAndReturnKey(
+					createVisitParameterSource(visit));
+			visit.setId(newKey.intValue());
+		} else {
+			throw new UnsupportedOperationException("Visit update not supported");
+		}
+	}
 
-    @Override
-    public void save(Visit visit) throws DataAccessException {
-        if (visit.isNew()) {
-            Number newKey = this.insertVisit.executeAndReturnKey(
-                createVisitParameterSource(visit));
-            visit.setId(newKey.intValue());
-        } else {
-            throw new UnsupportedOperationException("Visit update not supported");
-        }
-    }
+	/**
+	 * Creates a {@link MapSqlParameterSource} based on data values from the supplied {@link Visit} instance.
+	 */
+	private MapSqlParameterSource createVisitParameterSource(Visit visit) {
+		return new MapSqlParameterSource()
+				.addValue("id", visit.getId())
+				.addValue("visit_date", visit.getDate())
+				.addValue("description", visit.getDescription())
+				.addValue("pet_id", visit.getPet().getId());
+	}
 
+	@Override
+	public List<Visit> findByPetId(Integer petId) {
+		Map<String, Object> params = new HashMap<>();
+		params.put("id", petId);
+		JdbcPet pet = this.jdbcTemplate.queryForObject(
+				"SELECT id, name, birth_date, type_id, owner_id FROM pets WHERE id=:id",
+				params,
+				new JdbcPetRowMapper());
 
-    /**
-     * Creates a {@link MapSqlParameterSource} based on data values from the supplied {@link Visit} instance.
-     */
-    private MapSqlParameterSource createVisitParameterSource(Visit visit) {
-        return new MapSqlParameterSource()
-            .addValue("id", visit.getId())
-            .addValue("visit_date", visit.getDate())
-            .addValue("description", visit.getDescription())
-            .addValue("pet_id", visit.getPet().getId());
-    }
+		List<Visit> visits = this.jdbcTemplate.query(
+				"SELECT id as visit_id, visit_date, description FROM visits WHERE pet_id=:id",
+				params, new JdbcVisitRowMapper());
 
-    @Override
-    public List<Visit> findByPetId(Integer petId) {
-        Map<String, Object> params = new HashMap<>();
-        params.put("id", petId);
-        JdbcPet pet = this.jdbcTemplate.queryForObject(
-                "SELECT id, name, birth_date, type_id, owner_id FROM pets WHERE id=:id",
-                params,
-                new JdbcPetRowMapper());
+		for (Visit visit : visits) {
+			visit.setPet(pet);
+		}
 
-        List<Visit> visits = this.jdbcTemplate.query(
-            "SELECT id as visit_id, visit_date, description FROM visits WHERE pet_id=:id",
-            params, new JdbcVisitRowMapper());
-
-        for (Visit visit: visits) {
-            visit.setPet(pet);
-        }
-
-        return visits;
-    }
+		return visits;
+	}
 
 }

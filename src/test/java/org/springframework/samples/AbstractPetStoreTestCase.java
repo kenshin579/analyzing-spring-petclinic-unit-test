@@ -7,7 +7,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:spring/business-config.xml"})
+@ContextConfiguration(locations = { "classpath:spring/business-config.xml" })
 @ActiveProfiles("jdbc")
 public abstract class AbstractPetStoreTestCase {
 }

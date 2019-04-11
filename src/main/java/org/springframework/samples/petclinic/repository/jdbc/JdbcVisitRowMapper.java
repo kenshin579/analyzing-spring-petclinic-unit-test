@@ -15,7 +15,6 @@
  */
 package org.springframework.samples.petclinic.repository.jdbc;
 
-
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.samples.petclinic.model.Visit;
 
@@ -30,12 +29,12 @@ import java.util.Date;
  */
 class JdbcVisitRowMapper implements RowMapper<Visit> {
 
-    @Override
-    public Visit mapRow(ResultSet rs, int row) throws SQLException {
-        Visit visit = new Visit();
-        visit.setId(rs.getInt("visit_id"));
-        visit.setDate(rs.getObject("visit_date", LocalDate.class));
-        visit.setDescription(rs.getString("description"));
-        return visit;
-    }
+	@Override
+	public Visit mapRow(ResultSet rs, int row) throws SQLException {
+		Visit visit = new Visit();
+		visit.setId(rs.getInt("visit_id"));
+		visit.setDate(rs.getObject("visit_date", LocalDate.class));
+		visit.setDescription(rs.getString("description"));
+		return visit;
+	}
 }
